@@ -135,7 +135,16 @@ private actor SwiftDataExecutor {
     @discardableResult
     func run<T>(_ container: ModelContainer, _ work: @escaping (ModelContext) -> T) async -> T {
         let context = ModelContext(container)
-        return work(context)
+        let result = work(context)
+        // Every op gets its own short-lived ModelContext (see the type doc
+        // above), so mutations must be explicitly saved here — otherwise
+        // inserts/deletes/updates from one call would never be visible to
+        // the next call's fresh context, silently breaking the "survives
+        // relaunch" guarantee a write-ahead queue exists to provide.
+        if context.hasChanges {
+            try? context.save()
+        }
+        return result
     }
 }
 #endif
