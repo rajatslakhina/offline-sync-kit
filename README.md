@@ -44,4 +44,8 @@ Most "offline-first" iOS demos stop at `NSCache` + retry-on-fail. That's not wha
 
 **Verification tier, stated honestly:** this run's sandbox had no headless Swift toolchain reachable (the swift.org release download stalled at roughly 1 MB/s, which would take well over a thousand seconds for the full toolchain — not achievable within this run's time budget, and background downloads don't survive between shell calls in this environment). In place of `swift build`/`swift test`, every source and test file was checked with a scripted brace/paren/bracket balance pass (all files balanced) and a scripted scan for unguarded force-unwraps (`grep` for `!` outside `!=`/attribute usage — none found outside the one disclosed-and-commented case class this design deliberately avoids). The test suite was still written to the same standard as if `swift test` were about to run it — this is an honest statement of what *didn't* get automated confirmation this run, not a claim that it did.
 
-Demo app: (added after the companion repo is pushed — see below.)
+## Demo app
+
+[`offline-sync-kit-demo-app`](https://github.com/rajatslakhina/offline-sync-kit-demo-app) — a separate `Demo.xcodeproj` that consumes this package via a **remote** `XCRemoteSwiftPackageReference` (branch `main`), not a local path, exactly like any real external consumer would. Two simulated devices edit a shared list offline; tapping Sync Now drains the queue against a simulated flaky server and shows conflict merges, retry backoff, and dead-letter routing live.
+
+Honest status: this run could not get Simulator/computer-use access (unattended scheduled runs on this platform categorically block that live-control approval), so the demo has not yet been confirmed to launch — see that repo's README for the exact disclosure and what verification *was* done in its place.
